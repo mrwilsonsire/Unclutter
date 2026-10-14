@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Unclutter — Clean your inbox</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink:#0f0f0f;--ink-soft:#4a4a4a;--ink-mute:#9a9a9a;
+    --paper:#f8f7f4;--white:#fff;--accent:#2563EB;
+    --accent-light:#EFF4FF;--danger:#dc2626;--success:#16a34a;
+    --border:rgba(0,0,0,0.09);--border-strong:rgba(0,0,0,0.15);
+    --radius:10px;--sans:'DM Sans',system-ui,sans-serif;
+    --serif:'DM Serif Display',Georgia,serif;
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:var(--sans);background:var(--paper);color:var(--ink);font-size:16px;line-height:1.6;}
+  nav{position:sticky;top:0;z-index:100;background:rgba(248,247,244,0.95);backdrop-filter:blur(12px);border-bottom:0.5px solid var(--border);padding:0 2rem;height:56px;display:flex;align-items:center;justify-content:space-between;}
+  .logo{font-family:var(--serif);font-size:20px;color:var(--ink);text-decoration:none;}
+  .logo span{color:var(--accent);}
+  .nav-right{display:flex;align-items:center;gap:12px;}
+  .btn-sm{font-size:13px;font-weight:500;padding:7px 16px;border-radius:var(--radius);border:1px solid var(--border-strong);background:transparent;color:var(--ink);cursor:pointer;font-family:var(--sans);}
+  .btn-sm.primary{background:var(--ink);color:white;border-color:var(--ink);}
+  .page{display:none;} .page.active{display:block;}
+  .hero{text-align:center;padding:6rem 2rem 4rem;max-width:900px;margin:0 auto;}
+  .hero-eyebrow{display:inline-block;background:var(--accent-light);color:var(--accent);font-size:13px;font-weight:500;padding:4px 14px;border-radius:20px;margin-bottom:1.5rem;}
+  .hero h1{font-family:var(--serif);font-size:clamp(2.4rem,6vw,4rem);line-height:1.15;max-width:680px;margin:0 auto 1.25rem;font-weight:400;}
+  .hero p{font-size:18px;color:var(--ink-soft);max-width:520px;margin:0 auto 2.5rem;line-height:1.7;}
+  .hero-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;}
+  .btn-google{background:white;color:var(--ink);border:1px solid var(--border-strong);padding:13px 28px;border-radius:var(--radius);font-family:var(--sans);font-size:15px;font-weight:500;cursor:pointer;display:inline-flex;align-items:center;gap:10px;}
+  .btn-google svg{width:18px;height:18px;flex-shrink:0;}
+  .btn-primary{background:var(--accent);color:white;border:none;padding:13px 28px;border-radius:var(--radius);font-family:var(--sans);font-size:15px;font-weight:500;cursor:pointer;}
+  .stats{display:flex;gap:2rem;justify-content:center;flex-wrap:wrap;padding:2.5rem;background:var(--white);border-radius:16px;border:0.5px solid var(--border);max-width:700px;margin:2.5rem auto 0;}
+  .stat{text-align:center;} .stat-num{font-family:var(--serif);font-size:2rem;} .stat-label{font-size:13px;color:var(--ink-mute);}
+  .section{padding:5rem 2rem;max-width:900px;margin:0 auto;}
+  .section-label{font-size:13px;font-weight:500;color:var(--ink-mute);margin-bottom:0.5rem;}
+  .section-title{font-family:var(--serif);font-size:clamp(1.6rem,3.5vw,2.2rem);font-weight:400;margin-bottom:2.5rem;}
+  .how-box{background:var(--white);border-radius:16px;border:0.5px solid var(--border);padding:3rem;}
+  .steps-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:2rem;}
+  .step-icon{width:40px;height:40px;background:var(--accent-light);border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:1rem;font-size:20px;}
+  .step h3{font-size:15px;font-weight:600;margin-bottom:6px;} .step p{font-size:14px;color:var(--ink-soft);line-height:1.65;}
+  .pricing-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;}
+  .plan{background:var(--white);border:0.5px solid var(--border);border-radius:14px;padding:2rem;}
+  .plan.featured{border:2px solid var(--accent);}
+  .plan-badge{display:inline-block;background:var(--accent);color:white;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;margin-bottom:1rem;}
+  .plan-name{font-size:18px;font-weight:600;margin-bottom:4px;}
+  .plan-price{font-family:var(--serif);font-size:2.2rem;margin-bottom:4px;}
+  .plan-price span{font-family:var(--sans);font-size:14px;color:var(--ink-mute);}
+  .plan-desc{font-size:14px;color:var(--ink-soft);margin-bottom:1.5rem;}
+  .plan-features{list-style:none;display:flex;flex-direction:column;gap:8px;margin-bottom:1.5rem;}
+  .plan-features li{font-size:14px;display:flex;gap:8px;}
+  .plan-features li::before{content:'✓';color:var(--success);font-weight:600;flex-shrink:0;}
+  .plan-btn{width:100%;padding:12px;border-radius:var(--radius);font-family:var(--sans);font-size:14px;font-weight:500;cursor:pointer;border:1px solid var(--border-strong);background:transparent;color:var(--ink);}
+  .plan.featured .plan-btn{background:var(--accent);color:white;border-color:var(--accent);}
+  .dashboard{max-width:860px;margin:0 auto;padding:2rem;}
+  .dash-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:2rem;flex-wrap:wrap;gap:12px;}
+  .dash-header h2{font-family:var(--serif);font-size:1.8rem;font-weight:400;}
+  .dash-tabs{display:flex;gap:4px;background:var(--white);border:0.5px solid var(--border);border-radius:10px;padding:4px;}
+  .dash-tab{font-size:13px;font-weight:500;padding:7px 16px;border-radius:7px;border:none;background:transparent;cursor:pointer;color:var(--ink-soft);font-family:var(--sans);}
+  .dash-tab.active{background:var(--accent);color:white;}
+  .tab-content{display:none;} .tab-content.active{display:block;}
+  .scan-intro{background:var(--white);border:0.5px solid var(--border);border-radius:12px;padding:1.5rem;margin-bottom:1.5rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;}
+  .scan-intro p{font-size:14px;color:var(--ink-soft);}
+  .email-list{display:flex;flex-direction:column;gap:8px;}
+  .email-item{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:var(--radius);border:0.5px solid var(--border);background:var(--white);}
+  .email-item.unsub{border-color:#fca5a5;background:#fff5f5;}
+  .email-item.keep{border-color:#86efac;background:#f0fdf4;}
+  .email-avatar{width:38px;height:38px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+  .email-info{flex:1;min-width:0;}
+  .email-sender{font-size:14px;font-weight:500;}
+  .email-subject{font-size:12px;color:var(--ink-soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .email-freq{font-size:11px;color:var(--ink-mute);background:var(--paper);border:0.5px solid var(--border);border-radius:20px;padding:2px 8px;flex-shrink:0;}
+  .email-btns{display:flex;gap:6px;flex-shrink:0;}
+  .btn-unsub{font-size:12px;font-weight:500;padding:5px 11px;border-radius:6px;border:1px solid #fca5a5;background:white;color:var(--danger);cursor:pointer;font-family:var(--sans);}
+  .btn-keep{font-size:12px;font-weight:500;padding:5px 11px;border-radius:6px;border:1px solid #86efac;background:white;color:var(--success);cursor:pointer;font-family:var(--sans);}
+  .apply-row{margin-top:1.25rem;display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+  .apply-note{font-size:13px;color:var(--ink-mute);}
+  .success-msg{font-size:14px;font-weight:500;color:var(--success);display:none;}
+  .loading-state{text-align:center;padding:3rem;color:var(--ink-mute);font-size:14px;}
+  .spinner{width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 1rem;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+  .digest-card{background:var(--white);border:0.5px solid var(--border);border-radius:12px;overflow:hidden;}
+  .digest-head{background:var(--accent);color:white;padding:1.25rem 1.5rem;}
+  .digest-head h3{font-family:var(--serif);font-size:1.3rem;font-weight:400;}
+  .digest-head p{font-size:12px;opacity:0.8;margin-top:2px;}
+  .digest-row{padding:1rem 1.5rem;border-bottom:0.5px solid var(--border);display:flex;gap:12px;}
+  .digest-row:last-child{border-bottom:none;}
+  .digest-dot{width:8px;height:8px;border-radius:50%;margin-top:6px;flex-shrink:0;}
+  .digest-row h4{font-size:14px;font-weight:500;} .digest-row p{font-size:13px;color:var(--ink-soft);}
+  .empty-state{padding:3rem;text-align:center;color:var(--ink-mute);font-size:14px;}
+  .savings-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:1.5rem;}
+  .sav-card{background:var(--white);border:0.5px solid var(--border);border-radius:12px;padding:1.25rem;}
+  .sav-card.highlight{background:var(--accent-light);border-color:#bfdbfe;}
+  .sav-num{font-size:2rem;font-weight:600;} .sav-card.highlight .sav-num{color:var(--accent);}
+  .sav-label{font-size:12px;color:var(--ink-mute);margin-top:2px;}
+  .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:200;display:none;align-items:center;justify-content:center;padding:1rem;}
+  .modal-overlay.open{display:flex;}
+  .modal{background:var(--white);border-radius:16px;padding:2.5rem;max-width:400px;width:100%;text-align:center;position:relative;}
+  .modal h2{font-family:var(--serif);font-size:1.8rem;font-weight:400;margin-bottom:0.5rem;}
+  .modal p{font-size:14px;color:var(--ink-soft);margin-bottom:2rem;}
+  .modal-close{position:absolute;top:1rem;right:1rem;background:none;border:none;font-size:20px;cursor:pointer;color:var(--ink-mute);}
+  .modal-actions{display:flex;flex-direction:column;gap:10px;}
+  .user-pill{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink-soft);}
+  .user-avatar{width:28px;height:28px;border-radius:50%;background:var(--accent-light);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:var(--accent);overflow:hidden;}
+  .user-avatar img{width:100%;height:100%;object-fit:cover;}
+  footer{text-align:center;padding:2rem;font-size:13px;color:var(--ink-mute);border-top:0.5px solid var(--border);margin-top:4rem;}
+  @media(max-width:600px){.dashboard{padding:1rem;}.hero{padding:3rem 1.25rem 2rem;}.section{padding:3rem 1.25rem;}nav{padding:0 1rem;}}
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="logo" href="#">Un<span>clutter</span></a>
+  <div class="nav-right" id="nav-right">
+    <button class="btn-sm primary" onclick="openModal()">Sign in</button>
+  </div>
+</nav>
+
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <h2>Welcome</h2>
+    <p>Sign in to start cleaning your inbox</p>
+    <div class="modal-actions">
+      <button class="btn-google" onclick="signInGoogle()">
+        <svg viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+        Continue with Google
+      </button>
+      <p style="font-size:12px;color:var(--ink-mute);margin:0;">By signing in you agree to our Terms & Privacy Policy</p>
+    </div>
+  </div>
+</div>
+
+<!-- LANDING -->
+<div class="page active" id="page-landing">
+  <div class="hero">
+    <div class="hero-eyebrow">Free for 14 days · No credit card needed</div>
+    <h1>Your inbox, finally quiet</h1>
+    <p>Unclutter finds every newsletter and subscription email, lets you kill or keep each one, then bundles what you want into one daily digest.</p>
+    <div class="hero-actions">
+      <button class="btn-google" onclick="signInGoogle()">
+        <svg viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+        Sign in with Google — it's free
+      </button>
+      <button class="btn-primary" onclick="document.getElementById('pricing-section').scrollIntoView({behavior:'smooth'})">See pricing</button>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="stat-num">47</div><div class="stat-label">avg. subscriptions found</div></div>
+      <div class="stat"><div class="stat-num">2 min</div><div class="stat-label">to clean your inbox</div></div>
+      <div class="stat"><div class="stat-num">$5/mo</div><div class="stat-label">to stay clean forever</div></div>
+    </div>
+  </div>
+  <div class="section">
+    <div class="how-box">
+      <div class="section-label">How it works</div>
+      <div class="section-title">Three steps to inbox zero</div>
+      <div class="steps-grid">
+        <div class="step"><div class="step-icon">🔍</div><h3>We scan your inbox</h3><p>Unclutter finds every newsletter and subscription email — even forgotten ones.</p></div>
+        <div class="step"><div class="step-icon">✂️</div><h3>You choose what stays</h3><p>Tap to unsubscribe or keep, one by one. Takes about two minutes.</p></div>
+        <div class="step"><div class="step-icon">📬</div><h3>One digest, every day</h3><p>Everything you kept gets bundled into one beautiful email at your chosen time.</p></div>
+      </div>
+    </div>
+  </div>
+  <div class="section" id="pricing-section">
+    <div class="section-label">Pricing</div>
+    <div class="section-title">Simple, honest pricing</div>
+    <div class="pricing-grid">
+      <div class="plan">
+        <div class="plan-name">Free</div><div class="plan-price">$0 <span>/ mo</span></div>
+        <div class="plan-desc">One-time inbox clean.</div>
+        <ul class="plan-features"><li>Scan up to 100 emails</li><li>Unsubscribe from 10</li><li>Digest preview</li></ul>
+        <button class="plan-btn" onclick="signInGoogle()">Get started free</button>
+      </div>
+      <div class="plan featured">
+        <div class="plan-badge">Most popular</div>
+        <div class="plan-name">Pro</div><div class="plan-price">$5 <span>/ mo</span></div>
+        <div class="plan-desc">Stay clean forever.</div>
+        <ul class="plan-features"><li>Unlimited scanning</li><li>Unlimited unsubscribes</li><li>Daily digest</li><li>New subscription alerts</li></ul>
+        <button class="plan-btn" onclick="signInGoogle()">Start 14-day free trial</button>
+      </div>
+      <div class="plan">
+        <div class="plan-name">Family</div><div class="plan-price">$12 <span>/ mo</span></div>
+        <div class="plan-desc">Up to 5 inboxes.</div>
+        <ul class="plan-features"><li>Everything in Pro</li><li>5 email accounts</li><li>Shared digest</li><li>Priority support</li></ul>
+        <button class="plan-btn" onclick="signInGoogle()">Start free trial</button>
+      </div>
+    </div>
+  </div>
+  <footer>© 2026 Unclutter · <a href="#" style="color:inherit">Privacy</a> · <a href="#" style="color:inherit">Terms</a></footer>
+</div>
+
+<!-- DASHBOARD -->
+<div class="page" id="page-dashboard">
+  <div class="dashboard">
+    <div class="dash-header">
+      <h2>Your inbox</h2>
+      <div class="dash-tabs">
+        <button class="dash-tab active" onclick="switchTab('scan',this)">📧 Scan</button>
+        <button class="dash-tab" onclick="switchTab('digest',this)">📬 Digest</button>
+        <button class="dash-tab" onclick="switchTab('savings',this)">💰 Savings</button>
+      </div>
+    </div>
+    <div class="tab-content active" id="dash-scan">
+      <div class="scan-intro">
+        <div><strong>Subscriptions found</strong><p>Choose what to keep and what to unsubscribe from.</p></div>
+        <button class="btn-sm primary" onclick="loadScan()">🔄 Rescan</button>
+      </div>
+      <div id="scan-body"><div class="loading-state"><div class="spinner"></div>Scanning your inbox...</div></div>
+      <div class="apply-row" id="apply-row" style="display:none;">
+        <button class="btn-primary" onclick="applyChoices()">Apply my choices</button>
+        <span class="apply-note" id="apply-note">0 to unsubscribe · 0 to keep</span>
+        <span class="success-msg" id="success-msg">✓ Done! Check your digest.</span>
+      </div>
+    </div>
+    <div class="tab-content" id="dash-digest">
+      <div class="digest-card">
+        <div class="digest-head"><h3>Your daily digest</h3><p id="digest-date"></p></div>
+        <div id="digest-body"><div class="empty-state">Keep some subscriptions to see your digest here.</div></div>
+      </div>
+    </div>
+    <div class="tab-content" id="dash-savings">
+      <div class="savings-grid">
+        <div class="sav-card"><div class="sav-num" id="sav-unsub">0</div><div class="sav-label">Unsubscribed</div></div>
+        <div class="sav-card"><div class="sav-num" id="sav-keep">0</div><div class="sav-label">Kept in digest</div></div>
+        <div class="sav-card highlight"><div class="sav-num" id="sav-time">0 min</div><div class="sav-label">Time saved / week</div></div>
+        <div class="sav-card"><div class="sav-num" id="sav-total">0</div><div class="sav-label">Total scanned</div></div>
+      </div>
+      <p style="font-size:14px;color:var(--ink-soft);">Based on 45 seconds per unwanted email. Most users save 20+ minutes per week.</p>
+    </div>
+  </div>
+</div>
+
+<!-- SUPABASE -->
+<script>
+  // REPLACE THESE WITH YOUR VALUES
+  const SUPABASE_URL = 'YOUR_SUPABASE_URL';
+  const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js" onload="initApp()"></script>
+<script>
+const demoEmails = [
+  {avatar:'🛍️',bg:'#FEF3C7',sender:'ASOS',subject:'30% off everything this weekend',freq:'3× week',choice:null},
+  {avatar:'📰',bg:'#EFF4FF',sender:'The Hustle',subject:'Morning brief: AI takes Wall Street',freq:'daily',choice:null},
+  {avatar:'🎵',bg:'#F5F3FF',sender:'Spotify',subject:'New music Friday — made for you',freq:'weekly',choice:null},
+  {avatar:'💼',bg:'#F0FDF4',sender:'LinkedIn',subject:'12 new jobs match your profile',freq:'2× week',choice:null},
+  {avatar:'📦',bg:'#FFF7ED',sender:'Amazon',subject:'Your order has shipped!',freq:'varies',choice:null},
+  {avatar:'📈',bg:'#EFF4FF',sender:'Morning Brew',subject:'Markets, tech, and what you missed',freq:'daily',choice:null},
+  {avatar:'🏋️',bg:'#F0FDF4',sender:'Nike Training',subject:'Your weekly workout plan is ready',freq:'weekly',choice:null},
+  {avatar:'🍕',bg:'#FFF7ED',sender:'Uber Eats',subject:'Lunch deals near you today',freq:'daily',choice:null},
+];
+
+let sb, emails = [], currentUser = null;
+
+function initApp() {
+  sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  sb.auth.onAuthStateChange((event, session) => {
+    if (session?.user) {
+      currentUser = session.user;
+      updateNav(session.user);
+      showPage('dashboard');
+      closeModal();
+      loadScan();
+    } else {
+      currentUser = null;
+      showPage('landing');
+      updateNav(null);
+    }
+  });
+}
+
+async function signInGoogle() {
+  if (!sb) { alert('App still loading, please try again in a second.'); return; }
+  const { error } = await sb.auth.signInWithOAuth({
+    provider: 'google',
+    options: { redirectTo: window.location.origin }
+  });
+  if (error) alert('Sign in error: ' + error.message);
+}
+
+async function signOut() {
+  await sb.auth.signOut();
+}
+
+function openModal() { document.getElementById('modal').classList.add('open'); }
+function closeModal() { document.getElementById('modal').classList.remove('open'); }
+function showPage(n) { document.querySelectorAll('.page').forEach(p=>p.classList.remove('active')); document.getElementById('page-'+n).classList.add('active'); }
+
+function updateNav(user) {
+  const nav = document.getElementById('nav-right');
+  if (user) {
+    const initial = (user.user_metadata?.full_name || user.email || 'U')[0].toUpperCase();
+    const avatar = user.user_metadata?.avatar_url ? `<img src="${user.user_metadata.avatar_url}" alt="">` : initial;
+    nav.innerHTML = `<div class="user-pill"><div class="user-avatar">${avatar}</div><span>${user.user_metadata?.full_name || user.email}</span></div><button class="btn-sm" onclick="signOut()">Sign out</button>`;
+  } else {
+    nav.innerHTML = `<button class="btn-sm primary" onclick="openModal()">Sign in</button>`;
+  }
+}
+
+function loadScan() {
+  emails = JSON.parse(localStorage.getItem('uc_emails') || 'null') || demoEmails.map(e=>({...e}));
+  document.getElementById('scan-body').innerHTML = '<div class="loading-state"><div class="spinner"></div>Scanning your inbox...</div>';
+  document.getElementById('apply-row').style.display = 'none';
+  setTimeout(() => { renderEmailList(); document.getElementById('apply-row').style.display = 'flex'; updateNote(); updateSavings(); }, 1200);
+}
+
+function renderEmailList() {
+  document.getElementById('scan-body').innerHTML = `<div class="email-list">${emails.map((e,i)=>`
+    <div class="email-item${e.choice==='unsub'?' unsub':e.choice==='keep'?' keep':''}" id="ei-${i}">
+      <div class="email-avatar" style="background:${e.bg}">${e.avatar}</div>
+      <div class="email-info"><div class="email-sender">${e.sender}</div><div class="email-subject">${e.subject}</div></div>
+      <div class="email-freq">${e.freq}</div>
+      <div class="email-btns">
+        <button class="btn-unsub" onclick="setChoice(${i},'unsub')">Unsub</button>
+        <button class="btn-keep" onclick="setChoice(${i},'keep')">Keep</button>
+      </div>
+    </div>`).join('')}</div>`;
+}
+
+function setChoice(i, c) {
+  emails[i].choice = emails[i].choice===c ? null : c;
+  localStorage.setItem('uc_emails', JSON.stringify(emails));
+  document.getElementById('ei-'+i).className = 'email-item'+(emails[i].choice==='unsub'?' unsub':emails[i].choice==='keep'?' keep':'');
+  updateNote(); updateSavings();
+}
+
+function updateNote() {
+  const u=emails.filter(e=>e.choice==='unsub').length, k=emails.filter(e=>e.choice==='keep').length;
+  document.getElementById('apply-note').textContent = `${u} to unsubscribe · ${k} to keep`;
+}
+
+function applyChoices() {
+  const msg=document.getElementById('success-msg'), note=document.getElementById('apply-note');
+  msg.style.display='inline'; note.style.display='none';
+  renderDigest(); updateSavings();
+  setTimeout(()=>{msg.style.display='none';note.style.display='inline';},3000);
+}
+
+const colors=['#2563EB','#16a34a','#9333ea','#ea580c','#0891b2','#be185d'];
+function renderDigest() {
+  const kept=emails.filter(e=>e.choice==='keep');
+  const now=new Date();
+  document.getElementById('digest-date').textContent = now.toLocaleDateString('en-US',{weekday:'long'})+' · 8:00 AM · '+kept.length+' newsletter'+(kept.length!==1?'s':'');
+  document.getElementById('digest-body').innerHTML = kept.length
+    ? kept.map((e,i)=>`<div class="digest-row"><div class="digest-dot" style="background:${colors[i%colors.length]}"></div><div><h4>${e.sender}</h4><p>${e.subject}</p></div></div>`).join('')
+    : '<div class="empty-state">Keep some subscriptions above to see your digest here.</div>';
+}
+
+function updateSavings() {
+  const u=emails.filter(e=>e.choice==='unsub').length, k=emails.filter(e=>e.choice==='keep').length;
+  document.getElementById('sav-unsub').textContent=u;
+  document.getElementById('sav-keep').textContent=k;
+  document.getElementById('sav-time').textContent=Math.round(u*0.75*7)+' min';
+  document.getElementById('sav-total').textContent=emails.length;
+}
+
+function switchTab(n, btn) {
+  document.querySelectorAll('.dash-tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+  document.getElementById('dash-'+n).classList.add('active');
+  if(n==='digest') renderDigest();
+  if(n==='savings') updateSavings();
+}
+</script>
+</body>
+</html>

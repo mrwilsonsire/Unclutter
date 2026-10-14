@@ -297,7 +297,7 @@
 // REPLACE THESE WITH YOUR SUPABASE PROJECT VALUES
 const SUPABASE_URL = 'https://uqvapxohhtelddkrjphn.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVxdmFweG9oaHRlbGRka3JqcGhuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE5Mjc0NzQsImV4cCI6MjEwNzUwMzQ3NH0.I_toiLtiJIzCbks10HQ3LgaamHtuME2TZfF4FAQBKjg';
-const { createClient } = supabase;
+const { createClient } = window.supabase;
 const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // ─── DEMO EMAIL DATA ───────────────────────────────────────────────
